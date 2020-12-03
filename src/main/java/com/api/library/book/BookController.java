@@ -1,5 +1,8 @@
 package com.api.library.book;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 import javax.validation.Valid;
 
 import com.api.library.exceptions.ApiErrors;
@@ -7,6 +10,9 @@ import com.api.library.exceptions.LibraryException;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -65,6 +71,17 @@ public class BookController {
 
     }).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
 
+  }
+
+  @GetMapping
+  public Page<BookDTO> findBooksByQuery(BookDTO dto, Pageable pageRequest) {
+    Book book = modelMapper.map(dto, Book.class);
+    Page<Book> result = bookService.find(book, pageRequest);
+
+    List<BookDTO> response = result.getContent().stream().map(b -> modelMapper.map(b, BookDTO.class))
+        .collect(Collectors.toList());
+
+    return new PageImpl<BookDTO>(response, pageRequest, result.getTotalElements());
   }
 
   @ExceptionHandler(MethodArgumentNotValidException.class)

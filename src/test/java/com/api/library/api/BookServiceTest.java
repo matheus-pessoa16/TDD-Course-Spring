@@ -2,6 +2,8 @@ package com.api.library.api;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 
 import com.api.library.book.Book;
@@ -17,7 +19,10 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-
+import org.springframework.data.domain.Example;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
@@ -161,6 +166,28 @@ public class BookServiceTest {
 
     // verifica que o repository nunca vai executar o delete
     Mockito.verify(repository, Mockito.never()).save(book);
+
+  }
+
+  @Test
+  @DisplayName("should find a book by the parameters")
+  public void findBookTest() {
+    Book book = createBook();
+
+    PageRequest pageRequest = PageRequest.of(0, 10);
+
+    List<Book> list = Arrays.asList(book);
+
+    Page<Book> page = new PageImpl<Book>(list, pageRequest, 1);
+
+    Mockito.when(repository.findAll(Mockito.any(Example.class), Mockito.any(PageRequest.class))).thenReturn(page);
+
+    Page<Book> result = service.find(book, pageRequest);
+
+    Assertions.assertThat(result.getTotalElements()).isEqualTo(1);
+    Assertions.assertThat(result.getContent()).isEqualTo(list);
+    Assertions.assertThat(result.getPageable().getPageSize()).isEqualTo(10);
+    Assertions.assertThat(result.getPageable().getPageNumber()).isEqualTo(0);
 
   }
 
