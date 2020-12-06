@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.springframework.validation.BindingResult;
+import org.springframework.web.server.ResponseStatusException;
 
 public class ApiErrors {
 
@@ -18,6 +19,10 @@ public class ApiErrors {
 
   public ApiErrors(LibraryException ex) {
     errors = Arrays.asList(ex.getMessage());
+  }
+
+  public ApiErrors(ResponseStatusException ex) {
+    errors = Arrays.asList(ex.getReason());
   }
 
   public List<String> getErrors() {

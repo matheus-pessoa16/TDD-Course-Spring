@@ -4,6 +4,7 @@ import java.util.Arrays;
 import java.util.Optional;
 
 import com.api.library.book.Book;
+import com.api.library.book.BookController;
 import com.api.library.book.BookDTO;
 import com.api.library.book.BookService;
 import com.api.library.exceptions.LibraryException;
@@ -32,7 +33,7 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
 @ExtendWith(SpringExtension.class)
 @ActiveProfiles("test")
-@WebMvcTest
+@WebMvcTest(controllers = BookController.class)
 @AutoConfigureMockMvc
 public class BookControllerTest {
 

@@ -52,4 +52,8 @@ public class BookService {
     return bookRepository.findAll(example, pageRequest);
   }
 
+  public Optional<Book> findBookByIsnb(String isbn) {
+    return null;
+  }
+
 }

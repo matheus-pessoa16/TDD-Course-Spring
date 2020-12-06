@@ -5,18 +5,13 @@ import java.util.stream.Collectors;
 
 import javax.validation.Valid;
 
-import com.api.library.exceptions.ApiErrors;
-import com.api.library.exceptions.LibraryException;
-
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -82,18 +77,6 @@ public class BookController {
         .collect(Collectors.toList());
 
     return new PageImpl<BookDTO>(response, pageRequest, result.getTotalElements());
-  }
-
-  @ExceptionHandler(MethodArgumentNotValidException.class)
-  @ResponseStatus(HttpStatus.BAD_REQUEST)
-  public ApiErrors handleValidationException(MethodArgumentNotValidException ex) {
-    return new ApiErrors(ex.getBindingResult());
-  }
-
-  @ExceptionHandler(LibraryException.class)
-  @ResponseStatus(HttpStatus.BAD_REQUEST)
-  public ApiErrors handleLibraryException(LibraryException ex) {
-    return new ApiErrors(ex);
   }
 
 }
