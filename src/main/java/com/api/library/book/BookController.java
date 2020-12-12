@@ -5,6 +5,10 @@ import java.util.stream.Collectors;
 
 import javax.validation.Valid;
 
+import com.api.library.loan.Loan;
+import com.api.library.loan.LoanDTO;
+import com.api.library.loan.LoanService;
+
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -31,6 +35,9 @@ public class BookController {
 
   @Autowired
   private ModelMapper modelMapper;
+
+  @Autowired
+  private LoanService loanService;
 
   @PostMapping
   @ResponseStatus(HttpStatus.CREATED)
@@ -77,6 +84,25 @@ public class BookController {
         .collect(Collectors.toList());
 
     return new PageImpl<BookDTO>(response, pageRequest, result.getTotalElements());
+  }
+
+  @GetMapping("/{id}/loans")
+  public Page<LoanDTO> loansByBook(@PathVariable("id") Integer id, Pageable pageable) {
+
+    Book book = bookService.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+
+    Page<Loan> result = loanService.findLoansByBook(book, pageable);
+
+    List<LoanDTO> bookLoans = result.getContent().stream().map(loan -> {
+      Book loanBook = loan.getBook();
+      BookDTO bookDto = modelMapper.map(loanBook, BookDTO.class);
+      LoanDTO loanDto = modelMapper.map(loan, LoanDTO.class);
+      loanDto.setBook(bookDto);
+      return loanDto;
+    }).collect(Collectors.toList());
+
+    return new PageImpl<LoanDTO>(bookLoans, pageable, result.getTotalElements());
+
   }
 
 }

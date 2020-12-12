@@ -1,4 +1,4 @@
-package com.api.library.api;
+package com.api.library.service;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 
@@ -189,6 +189,26 @@ public class BookServiceTest {
     Assertions.assertThat(result.getPageable().getPageSize()).isEqualTo(10);
     Assertions.assertThat(result.getPageable().getPageNumber()).isEqualTo(0);
 
+  }
+
+  @Test
+  @DisplayName("should return a book by its isbn")
+  public void findBookByIsbnTest() {
+    String isbn = "123";
+    Book book = createBook();
+    book.setId(1);
+
+    Mockito.when(repository.findByIsbn(isbn)).thenReturn(Optional.of(book));
+
+    Optional<Book> foundBook = service.findBookByIsbn(isbn);
+
+    Assertions.assertThat(foundBook.isPresent()).isTrue();
+    Assertions.assertThat(foundBook.get().getId()).isEqualTo(book.getId());
+    Assertions.assertThat(foundBook.get().getAuthor()).isEqualTo(book.getAuthor());
+    Assertions.assertThat(foundBook.get().getTitle()).isEqualTo(book.getTitle());
+    Assertions.assertThat(foundBook.get().getIsbn()).isEqualTo(book.getIsbn());
+
+    Mockito.verify(repository, Mockito.times(1)).findByIsbn(isbn);
   }
 
 }

@@ -229,7 +229,6 @@ public class BookControllerTest {
         .andExpect(MockMvcResultMatchers.jsonPath("totalElements").value(1))
         .andExpect((MockMvcResultMatchers.jsonPath("pageable.pageSize").value(100)))
         .andExpect((MockMvcResultMatchers.jsonPath("pageable.pageNumber")).value(0));
-
   }
 
 }

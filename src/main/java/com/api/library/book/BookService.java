@@ -52,8 +52,12 @@ public class BookService {
     return bookRepository.findAll(example, pageRequest);
   }
 
-  public Optional<Book> findBookByIsnb(String isbn) {
-    return null;
+  public Optional<Book> findBookByIsbn(String isbn) {
+    if (isbn == null) {
+      throw new LibraryException("ISBN não pode ser nulo");
+    }
+
+    return bookRepository.findByIsbn(isbn);
   }
 
 }
