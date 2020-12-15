@@ -8,6 +8,7 @@ import com.api.library.book.BookController;
 import com.api.library.book.BookDTO;
 import com.api.library.book.BookService;
 import com.api.library.exceptions.LibraryException;
+import com.api.library.loan.LoanService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import org.hamcrest.Matchers;
@@ -44,6 +45,9 @@ public class BookControllerTest {
 
   @MockBean
   BookService service;
+
+  @MockBean
+  LoanService loanService;
 
   public BookDTO createBookDTO() {
     return BookDTO.builder().author("Teste").title("Teste").isbn("001").build();
