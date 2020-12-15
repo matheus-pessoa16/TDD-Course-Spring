@@ -26,8 +26,11 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
+import lombok.extern.slf4j.Slf4j;
+
 @RestController
 @RequestMapping("/api/book")
+@Slf4j
 public class BookController {
 
   @Autowired
@@ -42,6 +45,7 @@ public class BookController {
   @PostMapping
   @ResponseStatus(HttpStatus.CREATED)
   public BookDTO create(@RequestBody @Valid BookDTO dto) {
+    log.info("Creating a book for isbn : {}", dto.getIsbn());
     Book book = modelMapper.map(dto, Book.class);
     book = bookService.save(book);
     return modelMapper.map(book, BookDTO.class);
@@ -50,6 +54,7 @@ public class BookController {
   @GetMapping("{id}")
   @ResponseStatus(HttpStatus.OK)
   public BookDTO findById(@PathVariable("id") Integer id) {
+    log.info("Getting a book for the id : {}", id);
     return bookService.findById(id).map(book -> modelMapper.map(book, BookDTO.class))
         .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
   }
@@ -58,12 +63,13 @@ public class BookController {
   @ResponseStatus(HttpStatus.NO_CONTENT)
   public void delete(@PathVariable("id") Integer id) {
     Book book = bookService.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+    log.info("Deleting a book for title : {}", book.getTitle());
     bookService.delete(book);
   }
 
   @PutMapping("{id}")
   public BookDTO update(@PathVariable Integer id, BookDTO dto) {
-
+    log.info("Updating a book for id : {}", id);
     return bookService.findById(id).map(book -> {
 
       book.setAuthor(dto.getAuthor());
