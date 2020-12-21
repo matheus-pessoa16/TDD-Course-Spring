@@ -1,0 +1,14 @@
+{
+  "configurations": [
+    {
+      "type": "java",
+      "name": "Spring Boot-LibraryApplication<library>",
+      "request": "launch",
+      "cwd": "${workspaceFolder}",
+      "console": "internalConsole",
+      "mainClass": "com.api.library.LibraryApplication",
+      "projectName": "library",
+      "args": ""
+    }
+  ]
+}
