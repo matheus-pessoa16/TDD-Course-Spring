@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="pt"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>LoanService.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">library</a> &gt; <a href="index.source.html" class="el_package">com.api.library.loan</a> &gt; <span class="el_source">LoanService.java</span></div><h1>LoanService.java</h1><pre class="source lang-java linenums">package com.api.library.loan;
+
+import java.time.LocalDate;
+import java.util.List;
+import java.util.Optional;
+
+import com.api.library.book.Book;
+import com.api.library.exceptions.LibraryException;
+
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Service;
+
+@Service
+public class LoanService {
+
+  private LoanRepository loanRepository;
+
+<span class="fc" id="L19">  public LoanService(LoanRepository loanRepository) {</span>
+
+<span class="fc" id="L21">    this.loanRepository = loanRepository;</span>
+
+<span class="fc" id="L23">  }</span>
+
+  public Loan save(Loan loan) {
+
+<span class="fc bfc" id="L27" title="All 2 branches covered.">    if (loanRepository.existsByBookAndNotReturned(loan.getBook())) {</span>
+<span class="fc" id="L28">      throw new LibraryException(&quot;Book already borrowed&quot;);</span>
+    }
+
+<span class="fc" id="L31">    return loanRepository.save(loan);</span>
+  }
+
+  public Optional&lt;Loan&gt; findById(Integer id) {
+<span class="fc" id="L35">    return loanRepository.findById(id);</span>
+  }
+
+  public Loan update(Loan loan) {
+<span class="fc" id="L39">    return loanRepository.save(loan);</span>
+  }
+
+  public Page&lt;Loan&gt; find(LoanFilterDTO loanFilter, Pageable pageRequest) {
+<span class="fc" id="L43">    return loanRepository.findByBookIsbnOrCustomer(loanFilter.getIsbn(), loanFilter.getCustomer(), pageRequest);</span>
+  }
+
+  public Page&lt;Loan&gt; findLoansByBook(Book book, Pageable pageable) {
+<span class="nc" id="L47">    return loanRepository.findByBook(book, pageable);</span>
+  }
+
+  public List&lt;Loan&gt; findAllLateLoands() {
+<span class="nc" id="L51">    final int loanDays = 4;</span>
+<span class="nc" id="L52">    LocalDate threeDaysAgo = LocalDate.now().minusDays(loanDays);</span>
+<span class="nc" id="L53">    return loanRepository.findByLoanDateLessThanAndNotReturned(threeDaysAgo);</span>
+  }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.6.202009150832</span></div></body></html>

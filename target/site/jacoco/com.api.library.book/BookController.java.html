@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="pt"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>BookController.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">library</a> &gt; <a href="index.source.html" class="el_package">com.api.library.book</a> &gt; <span class="el_source">BookController.java</span></div><h1>BookController.java</h1><pre class="source lang-java linenums">package com.api.library.book;
+
+import java.util.List;
+import java.util.stream.Collectors;
+
+import javax.validation.Valid;
+
+import com.api.library.loan.Loan;
+import com.api.library.loan.LoanDTO;
+import com.api.library.loan.LoanService;
+
+import org.modelmapper.ModelMapper;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.server.ResponseStatusException;
+
+import lombok.extern.slf4j.Slf4j;
+
+@RestController
+@RequestMapping(&quot;/api/book&quot;)
+<span class="fc" id="L33">@Slf4j</span>
+<span class="fc" id="L34">public class BookController {</span>
+
+  @Autowired
+  private BookService bookService;
+
+  @Autowired
+  private ModelMapper modelMapper;
+
+  @Autowired
+  private LoanService loanService;
+
+  @PostMapping
+  @ResponseStatus(HttpStatus.CREATED)
+  public BookDTO create(@RequestBody @Valid BookDTO dto) {
+<span class="fc" id="L48">    log.info(&quot;Creating a book for isbn : {}&quot;, dto.getIsbn());</span>
+<span class="fc" id="L49">    Book book = modelMapper.map(dto, Book.class);</span>
+<span class="fc" id="L50">    book = bookService.save(book);</span>
+<span class="fc" id="L51">    return modelMapper.map(book, BookDTO.class);</span>
+  }
+
+  @GetMapping(&quot;{id}&quot;)
+  @ResponseStatus(HttpStatus.OK)
+  public BookDTO findById(@PathVariable(&quot;id&quot;) Integer id) {
+<span class="fc" id="L57">    log.info(&quot;Getting a book for the id : {}&quot;, id);</span>
+<span class="fc" id="L58">    return bookService.findById(id).map(book -&gt; modelMapper.map(book, BookDTO.class))</span>
+<span class="fc" id="L59">        .orElseThrow(() -&gt; new ResponseStatusException(HttpStatus.NOT_FOUND));</span>
+  }
+
+  @DeleteMapping(&quot;{id}&quot;)
+  @ResponseStatus(HttpStatus.NO_CONTENT)
+  public void delete(@PathVariable(&quot;id&quot;) Integer id) {
+<span class="fc" id="L65">    Book book = bookService.findById(id).orElseThrow(() -&gt; new ResponseStatusException(HttpStatus.NOT_FOUND));</span>
+<span class="fc" id="L66">    log.info(&quot;Deleting a book for title : {}&quot;, book.getTitle());</span>
+<span class="fc" id="L67">    bookService.delete(book);</span>
+<span class="fc" id="L68">  }</span>
+
+  @PutMapping(&quot;{id}&quot;)
+  public BookDTO update(@PathVariable Integer id, BookDTO dto) {
+<span class="fc" id="L72">    log.info(&quot;Updating a book for id : {}&quot;, id);</span>
+<span class="fc" id="L73">    return bookService.findById(id).map(book -&gt; {</span>
+
+<span class="fc" id="L75">      book.setAuthor(dto.getAuthor());</span>
+<span class="fc" id="L76">      book.setTitle(dto.getTitle());</span>
+<span class="fc" id="L77">      book = bookService.update(book);</span>
+<span class="fc" id="L78">      return modelMapper.map(book, BookDTO.class);</span>
+
+<span class="fc" id="L80">    }).orElseThrow(() -&gt; new ResponseStatusException(HttpStatus.NOT_FOUND));</span>
+
+  }
+
+  @GetMapping
+  public Page&lt;BookDTO&gt; findBooksByQuery(BookDTO dto, Pageable pageRequest) {
+<span class="fc" id="L86">    Book book = modelMapper.map(dto, Book.class);</span>
+<span class="fc" id="L87">    Page&lt;Book&gt; result = bookService.find(book, pageRequest);</span>
+
+<span class="fc" id="L89">    List&lt;BookDTO&gt; response = result.getContent().stream().map(b -&gt; modelMapper.map(b, BookDTO.class))</span>
+<span class="fc" id="L90">        .collect(Collectors.toList());</span>
+
+<span class="fc" id="L92">    return new PageImpl&lt;BookDTO&gt;(response, pageRequest, result.getTotalElements());</span>
+  }
+
+  @GetMapping(&quot;/{id}/loans&quot;)
+  public Page&lt;LoanDTO&gt; loansByBook(@PathVariable(&quot;id&quot;) Integer id, Pageable pageable) {
+
+<span class="nc" id="L98">    Book book = bookService.findById(id).orElseThrow(() -&gt; new ResponseStatusException(HttpStatus.NOT_FOUND));</span>
+
+<span class="nc" id="L100">    Page&lt;Loan&gt; result = loanService.findLoansByBook(book, pageable);</span>
+
+<span class="nc" id="L102">    List&lt;LoanDTO&gt; bookLoans = result.getContent().stream().map(loan -&gt; {</span>
+<span class="nc" id="L103">      Book loanBook = loan.getBook();</span>
+<span class="nc" id="L104">      BookDTO bookDto = modelMapper.map(loanBook, BookDTO.class);</span>
+<span class="nc" id="L105">      LoanDTO loanDto = modelMapper.map(loan, LoanDTO.class);</span>
+<span class="nc" id="L106">      loanDto.setBook(bookDto);</span>
+<span class="nc" id="L107">      return loanDto;</span>
+<span class="nc" id="L108">    }).collect(Collectors.toList());</span>
+
+<span class="nc" id="L110">    return new PageImpl&lt;LoanDTO&gt;(bookLoans, pageable, result.getTotalElements());</span>
+
+  }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.6.202009150832</span></div></body></html>
