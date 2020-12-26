@@ -1,8 +1,15 @@
 language: java
 jdk:
-  - openjdk11
+- openjdk11
 dist: trusty
 before_install:
-  - chmod +x mvnw
+- chmod +x mvnw
 after_success:
-  - bash <(curl -s https://codecov.io/bash)
+- bash <(curl -s https://codecov.io/bash)
+env:
+  global:
+    secure: Et5ePoGb5caTZnhARJk3w2btqmDdhzC5d2uKjnPPwPwljIPLz/XSCnYUKV0gVZoO5ScsA2e7T/GsMqiAZB4NOB+6hvHGdFu2NPQotito/ctjMzm4+Yukj3zmVJc67CITml3fPpya7h4tQ0jxn2QRWEZwKc6nsLCVLdoSF7ZTGKTPf1H+hc9/5PDNT/dHTvkJp2fivd6rH3XVtd1Cd0FXpFY33eU/t9sB1WyuxX1iwTG0l9CCGP7SSqL2fS14epaC+K535cRR1FkLp+rc8X2TNcRTVQtc8fN2muDk5QsSQ0CT+aLeABkwd0ph/ar9qppzM5KQexyYybhrdeI0KWuVKSmUH6lzy5Ndzs4/WhCv6zROLVLtSUUD9QnY3WX+O5j8rG3Mv9bikON+rIE2TKkDwUArEqMpT+JE1zZ+iHUJni5+ruBLB1eFQSoC9pB4zH1eU/k2Yeg4Kiog1y0PyWi7hilEYixDoxnsrP9Ua+UXtk1vtn8ck1YGE/k5Wgq3LMOG4gFMxmd5RF4TrAsimIlTIDUQdBA/JwKGAcNICtBGFaEfITxs5ddWPVrLl+mv7cbt8KuUF1HvfeHbHzW0aoOysoG76Ndbhy65faC8FA7biLXve/gX7mKt7enyDcDCF5OLTMkAyntaSpg1coELu2IT7IrUbbxP7kSi/6p0Gp/GoBU=
+deploy:
+  provider: heroku:git
+  api_key: HEROKU_API
+  edge: true
